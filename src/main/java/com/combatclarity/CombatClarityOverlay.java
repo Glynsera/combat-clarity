@@ -23,30 +23,36 @@ public class CombatClarityOverlay extends Overlay
 
     private final Client client;
     private final CombatClarityConfig config;
+    private final NpcCombatStyles npcCombatStyles;
 
     private final BufferedImage meleeIcon;
     private final BufferedImage rangedIcon;
     private final BufferedImage magicIcon;
 
     @Inject
-    public CombatClarityOverlay(Client client, CombatClarityConfig config)
+    public CombatClarityOverlay(
+            Client client,
+            CombatClarityConfig config,
+            NpcCombatStyles npcCombatStyles
+    )
     {
         this.client = client;
         this.config = config;
+        this.npcCombatStyles = npcCombatStyles;
 
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
 
         meleeIcon = createIcon(
-            NpcCombatStyles.Style.MELEE
+                NpcCombatStyles.Style.MELEE
         );
 
         rangedIcon = createIcon(
-            NpcCombatStyles.Style.RANGED
+                NpcCombatStyles.Style.RANGED
         );
 
         magicIcon = createIcon(
-            NpcCombatStyles.Style.MAGIC
+                NpcCombatStyles.Style.MAGIC
         );
     }
 
@@ -61,12 +67,12 @@ public class CombatClarityOverlay extends Overlay
         int size = Math.max(12, config.indicatorSize());
 
         Object oldHint = graphics.getRenderingHint(
-            RenderingHints.KEY_INTERPOLATION
+                RenderingHints.KEY_INTERPOLATION
         );
 
         graphics.setRenderingHint(
-            RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+                RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         );
 
         for (NPC npc : client.getNpcs())
@@ -77,7 +83,7 @@ public class CombatClarityOverlay extends Overlay
             }
 
             EnumSet<NpcCombatStyles.Style> styles =
-                NpcCombatStyles.getStyles(npc);
+                    npcCombatStyles.getStyles(npc);
 
             if (styles.isEmpty())
             {
@@ -85,12 +91,12 @@ public class CombatClarityOverlay extends Overlay
             }
 
             net.runelite.api.Point point =
-                Perspective.localToCanvas(
-                    client,
-                    npc.getLocalLocation(),
-                    client.getPlane(),
-                    npc.getLogicalHeight() + 40
-                );
+                    Perspective.localToCanvas(
+                            client,
+                            npc.getLocalLocation(),
+                            client.getPlane(),
+                            npc.getLogicalHeight() + 40
+                    );
 
             if (point == null)
             {
@@ -107,7 +113,7 @@ public class CombatClarityOverlay extends Overlay
             if (styles.contains(NpcCombatStyles.Style.MELEE))
             {
                 graphics.drawImage(
-                    meleeIcon, x, y, size, size, null
+                        meleeIcon, x, y, size, size, null
                 );
                 x += size + GAP;
             }
@@ -115,7 +121,7 @@ public class CombatClarityOverlay extends Overlay
             if (styles.contains(NpcCombatStyles.Style.RANGED))
             {
                 graphics.drawImage(
-                    rangedIcon, x, y, size, size, null
+                        rangedIcon, x, y, size, size, null
                 );
                 x += size + GAP;
             }
@@ -123,7 +129,7 @@ public class CombatClarityOverlay extends Overlay
             if (styles.contains(NpcCombatStyles.Style.MAGIC))
             {
                 graphics.drawImage(
-                    magicIcon, x, y, size, size, null
+                        magicIcon, x, y, size, size, null
                 );
             }
         }
@@ -131,8 +137,8 @@ public class CombatClarityOverlay extends Overlay
         if (oldHint != null)
         {
             graphics.setRenderingHint(
-                RenderingHints.KEY_INTERPOLATION,
-                oldHint
+                    RenderingHints.KEY_INTERPOLATION,
+                    oldHint
             );
         }
 
@@ -142,17 +148,17 @@ public class CombatClarityOverlay extends Overlay
     private BufferedImage createIcon(NpcCombatStyles.Style style)
     {
         BufferedImage image = new BufferedImage(
-            BASE_SIZE,
-            BASE_SIZE,
-            BufferedImage.TYPE_INT_ARGB
+                BASE_SIZE,
+                BASE_SIZE,
+                BufferedImage.TYPE_INT_ARGB
         );
 
         Graphics2D g = image.createGraphics();
 
         // Pixel-art look: no antialiasing.
         g.setRenderingHint(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_OFF
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_OFF
         );
 
         Color border;
@@ -206,17 +212,17 @@ public class CombatClarityOverlay extends Overlay
         // Dark outline of diagonal sword.
         g.setColor(new Color(42, 37, 28));
         g.fillPolygon(
-            new int[]{5, 8, 19, 20, 16},
-            new int[]{16, 19, 8, 4, 5},
-            5
+                new int[]{5, 8, 19, 20, 16},
+                new int[]{16, 19, 8, 4, 5},
+                5
         );
 
         // Silver blade.
         g.setColor(new Color(200, 210, 222));
         g.fillPolygon(
-            new int[]{8, 11, 18, 19, 16},
-            new int[]{15, 17, 8, 5, 7},
-            5
+                new int[]{8, 11, 18, 19, 16},
+                new int[]{15, 17, 8, 5, 7},
+                5
         );
 
         // Blade highlight.
@@ -242,9 +248,9 @@ public class CombatClarityOverlay extends Overlay
         // Wooden bow, curved to the right.
         g.setColor(new Color(151, 88, 34));
         g.setStroke(new BasicStroke(
-            3,
-            BasicStroke.CAP_ROUND,
-            BasicStroke.JOIN_ROUND
+                3,
+                BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_ROUND
         ));
 
         g.drawArc(8, 4, 11, 16, -95, 190);
@@ -262,17 +268,17 @@ public class CombatClarityOverlay extends Overlay
         // Silver arrowhead.
         g.setColor(new Color(230, 238, 240));
         g.fillPolygon(
-            new int[]{18, 21, 20},
-            new int[]{5, 4, 8},
-            3
+                new int[]{18, 21, 20},
+                new int[]{5, 4, 8},
+                3
         );
 
         // Green fletching.
         g.setColor(new Color(65, 230, 115));
         g.fillPolygon(
-            new int[]{5, 4, 9},
-            new int[]{15, 20, 19},
-            3
+                new int[]{5, 4, 9},
+                new int[]{15, 20, 19},
+                3
         );
     }
 
@@ -281,17 +287,17 @@ public class CombatClarityOverlay extends Overlay
         // Hat silhouette.
         g.setColor(new Color(15, 62, 172));
         g.fillPolygon(
-            new int[]{5, 8, 12, 15, 18, 17, 19},
-            new int[]{17, 12, 4, 5, 8, 10, 17},
-            7
+                new int[]{5, 8, 12, 15, 18, 17, 19},
+                new int[]{17, 12, 4, 5, 8, 10, 17},
+                7
         );
 
         // Brighter blue front.
         g.setColor(new Color(48, 118, 255));
         g.fillPolygon(
-            new int[]{8, 12, 14, 12, 10},
-            new int[]{16, 6, 6, 11, 17},
-            5
+                new int[]{8, 12, 14, 12, 10},
+                new int[]{16, 6, 6, 11, 17},
+                5
         );
 
         // Curved tip.

@@ -11,8 +11,11 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import net.runelite.api.NPC;
 
+@Singleton
 public final class NpcCombatStyles
 {
     public enum Style
@@ -22,27 +25,29 @@ public final class NpcCombatStyles
         RANGED
     }
 
-    private static final Map<Integer, EnumSet<Style>> STYLES = loadDatabase();
+    private final Map<Integer, EnumSet<Style>> styles;
 
-    private NpcCombatStyles()
+    @Inject
+    public NpcCombatStyles(Gson gson)
     {
+        styles = loadDatabase(gson);
     }
 
-    public static EnumSet<Style> getStyles(NPC npc)
+    public EnumSet<Style> getStyles(NPC npc)
     {
         if (npc == null)
         {
             return EnumSet.noneOf(Style.class);
         }
 
-        EnumSet<Style> styles = STYLES.get(npc.getId());
+        EnumSet<Style> npcStyles = styles.get(npc.getId());
 
-        return styles == null
+        return npcStyles == null
                 ? EnumSet.noneOf(Style.class)
-                : EnumSet.copyOf(styles);
+                : EnumSet.copyOf(npcStyles);
     }
 
-    private static Map<Integer, EnumSet<Style>> loadDatabase()
+    private static Map<Integer, EnumSet<Style>> loadDatabase(Gson gson)
     {
         Map<Integer, EnumSet<Style>> database = new HashMap<>();
 
@@ -57,7 +62,7 @@ public final class NpcCombatStyles
 
             Type listType = new TypeToken<List<NpcEntry>>() {}.getType();
 
-            List<NpcEntry> entries = new Gson().fromJson(
+            List<NpcEntry> entries = gson.fromJson(
                     new InputStreamReader(stream, StandardCharsets.UTF_8),
                     listType
             );
@@ -74,7 +79,7 @@ public final class NpcCombatStyles
                     continue;
                 }
 
-                EnumSet<Style> styles = EnumSet.noneOf(Style.class);
+                EnumSet<Style> npcStyles = EnumSet.noneOf(Style.class);
 
                 for (String style : entry.styles)
                 {
@@ -85,7 +90,7 @@ public final class NpcCombatStyles
 
                     try
                     {
-                        styles.add(Style.valueOf(style.toUpperCase()));
+                        npcStyles.add(Style.valueOf(style.toUpperCase()));
                     }
                     catch (IllegalArgumentException ignored)
                     {
@@ -93,9 +98,9 @@ public final class NpcCombatStyles
                     }
                 }
 
-                if (!styles.isEmpty())
+                if (!npcStyles.isEmpty())
                 {
-                    database.merge(entry.npcId, styles, (existing, added) ->
+                    database.merge(entry.npcId, npcStyles, (existing, added) ->
                     {
                         existing.addAll(added);
                         return existing;
