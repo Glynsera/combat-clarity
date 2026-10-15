@@ -35,3 +35,5 @@ wiki-conflicts.csv
 .git-epicdrops-backup/
 
 .git-epicdrops-original/
+
+/import-wiki.ps1
