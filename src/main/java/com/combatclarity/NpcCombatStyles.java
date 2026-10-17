@@ -14,10 +14,15 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.NPC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public final class NpcCombatStyles
 {
+    private static final Logger log =
+            LoggerFactory.getLogger(NpcCombatStyles.class);
+
     public enum Style
     {
         MELEE,
@@ -56,7 +61,7 @@ public final class NpcCombatStyles
         {
             if (stream == null)
             {
-                System.err.println("[Combat Clarity] NPC database not found.");
+                log.error("Combat Clarity NPC database not found.");
                 return database;
             }
 
@@ -110,10 +115,7 @@ public final class NpcCombatStyles
         }
         catch (Exception e)
         {
-            System.err.println(
-                    "[Combat Clarity] Failed to load NPC database: "
-                            + e.getMessage()
-            );
+            log.error("Failed to load Combat Clarity NPC database.", e);
         }
 
         return database;
